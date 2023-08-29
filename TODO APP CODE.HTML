@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do App</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+    }
+    .app-title {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2a0e70;
+      font-size: 50px;
+      font-weight: bolder;
+      font-family: 'Times New Roman', Times, serif;
+      background-color: rgb(248, 248, 175);
+      margin-right: 270px;
+      margin-left: 270px;
+      padding-top: 2px;
+      padding-bottom: 5px;
+      margin-bottom: 40px;
+    }
+    .input-group {
+      margin-bottom: 20px;
+    }
+    .form-control{
+      height: 25px;
+      width: 250px;
+      border: rgb(0, 0, 0) 2px solid;
+    }
+    .category-select {
+      background-color: #f8f9fa;
+      border: none;
+      outline: none;
+      background-color: rgb(225, 224, 224);
+      color: black;
+      font-weight: bold;
+      height: 25px;
+    }
+    .add-button {
+      background-color: #85c895d5;
+      border: none;
+      outline: none;
+      height: 25px;
+      border-radius: 8px;
+      font-weight: bolder;
+      margin-bottom: 10px;
+    }
+    .list-group {
+      list-style-type: none;
+      padding: 0;
+    }
+    .list-group-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      margin-bottom: 8px;
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .task-box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 40px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 6px;
+    }
+    .completed {
+      text-decoration: line-through;
+      cursor: pointer;
+    }
+    .work {
+      background-color: rgb(235, 214, 131);
+      color: rgb(0, 0, 0);
+      font-size: 20px;
+    }
+    .personal {
+      background-color: rgb(226, 202, 103);
+      color: rgb(0, 0, 0);
+      font-size: 20px;
+    }
+    .shopping {
+      background-color: rgb(224, 187, 38);
+      color: rgb(0, 0, 0);
+      font-size: 20px;
+    }
+    .edit-delete-icons {
+      display: none;
+    }
+    .list-group-item:hover .edit-delete-icons {
+      display: block;
+    }
+    .edit-icon {
+      background-color: #a9a607;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-right: 5px;
+      cursor: pointer;
+    }
+    .delete-icon {
+      background-color: #ee4556;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .edit-task-input {
+      display: none;
+      width: 100%;
+    }
+  </style>
+</head>
+<body background="./bg.webp">
+
+<div class="container">
+  <h1 class="app-title">To-Do App</h1>
+  <div class="input-group mb-3">
+    <input type="text" class="form-control" id="taskInput" placeholder="Add a new task...">
+    <select class="form-select category-select" id="categorySelect">
+      <option value="work">Work</option>
+      <option value="personal">Personal</option>
+      <option value="shopping">Shopping</option>
+    </select>
+    <button class="btn btn-primary add-button" id="addTask">Add Task</button>
+  </div>
+  <div class="row">
+    <div class="col-md-4">
+      <div class="list-group work" id="workList">
+        <h3 class="category-label">Work</h3>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="list-group personal" id="personalList">
+        <h3 class="category-label">Personal</h3>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="list-group shopping" id="shoppingList">
+        <h3 class="category-label">Shopping</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const taskInput = document.getElementById("taskInput");
+    const categorySelect = document.getElementById("categorySelect");
+    const addTaskButton = document.getElementById("addTask");
+    const workList = document.getElementById("workList");
+    const personalList = document.getElementById("personalList");
+    const shoppingList = document.getElementById("shoppingList");
+
+    addTaskButton.addEventListener("click", addTask);
+    taskInput.addEventListener("keypress", function (event) {
+      if (event.key === "Enter") {
+        addTask();
+      }
+    });
+
+    function createTaskListItem(taskText, category) {
+      const listItem = document.createElement("li");
+      listItem.className = "list-group-item d-flex justify-content-between align-items-center";
+      
+      const taskBox = document.createElement("div");
+      taskBox.className = "task-box";
+      taskBox.textContent = "✓";
+      listItem.appendChild(taskBox);
+
+      const taskContent = document.createElement("div");
+      taskContent.textContent = taskText;
+      listItem.appendChild(taskContent);
+
+      const editDeleteIcons = document.createElement("div");
+      editDeleteIcons.className = "edit-delete-icons";
+      editDeleteIcons.innerHTML = '<span class="edit-icon" title="Edit">&#9998;</span><span class="delete-icon" title="Delete">&#128465;</span>';
+      listItem.appendChild(editDeleteIcons);
+
+      const editTaskInput = document.createElement("input");
+      editTaskInput.className = "edit-task-input form-control";
+      editTaskInput.value = taskText;
+      listItem.appendChild(editTaskInput);
+
+      listItem.classList.add(category);
+
+      return listItem;
+    }
+
+    function addTask() {
+      const taskText = taskInput.value.trim();
+      if (taskText !== "") {
+        const selectedCategory = categorySelect.value;
+        let taskList;
+
+        if (selectedCategory === "work") {
+          taskList = workList;
+        } else if (selectedCategory === "personal") {
+          taskList = personalList;
+        } else if (selectedCategory === "shopping") {
+          taskList = shoppingList;
+        }
+
+        const listItem = createTaskListItem(taskText, selectedCategory);
+        taskList.appendChild(listItem);
+
+        taskInput.value = "";
+      }
+    }
+
+    workList.addEventListener("click", handleTaskAction);
+    personalList.addEventListener("click", handleTaskAction);
+    shoppingList.addEventListener("click", handleTaskAction);
+
+    function handleTaskAction(event) {
+      if (event.target.classList.contains("task-box")) {
+        const listItem = event.target.closest(".list-group-item");
+        listItem.classList.toggle("completed");
+      } else if (event.target.classList.contains("edit-icon")) {
+        const listItem = event.target.closest(".list-group-item");
+        const taskContent = listItem.querySelector("div:not(.task-box)");
+        const editTaskInput = listItem.querySelector(".edit-task-input");
+        taskContent.style.display = "none";
+        editTaskInput.style.display = "block";
+        editTaskInput.focus();
+        editTaskInput.addEventListener("keypress", function (event) {
+          if (event.key === "Enter") {
+            taskContent.textContent = editTaskInput.value;
+            taskContent.style.display = "block";
+            editTaskInput.style.display = "none";
+          }
+        });
+      } else if (event.target.classList.contains("delete-icon")) {
+        const listItem = event.target.closest(".list-group-item");
+        listItem.remove();
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
